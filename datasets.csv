@@ -1,0 +1,22 @@
+name	taxon	subtaxon	Genotype	link
+Acol	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AcolNg/AcolNg_V3.hic
+AmerA	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AmerR4/AmerR4_V3A.hic
+Amer	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AmerR4/AmerR4_V3.hic
+Aste	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AsteI2/AsteI2_V3.hic
+Aqmac	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/Aqmac/Aqmac_V3R.hic
+Dmel	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414719_Dmel.hic
+Dbus	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414720_Dbus.hic
+Dvir	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414721_Dvir.hic
+Culex	insect	culex	WT	https://genedev.bionet.nsc.ru/site/hic_out/culex/Culex/culex3.allValidPairs.hic
+ChEF	vertebrate	chick	WT	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChEF.hic
+CME	vertebrate	chick	WT	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChME.hic
+Aacr	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaCR_1_allValidPairs.hic
+AaU	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaU_3.hic
+BonevNPC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/NPC_mapq30.hic
+BonevmESC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/ES_mapq30.hic
+PhansteynMonocytes	vertebrate	mammals	WT	https://s3.amazonaws.com/hicfiles/external/phanstiel/updated_O/Snyder_O.hic
+RaoCondensinUntreated	vertebrate	mammals	+Condensin	https://s3.amazonaws.com/hicfiles/hiseq/degron/untreated/unsynchronized/combined.hic
+RaoCondensinDegron	vertebrate	mammals	-Condensin	https://s3.amazonaws.com/hicfiles/hiseq/degron/treated_6hr/unsynchronized/combined.hic
+2017Haarhuis_KO_WAPL1	vertebrate	mammals	-WAPL	https://s3.amazonaws.com/hicfiles/external/wapl_hic/WaplKO_1.14.hic
+2017Haarhuis_Kontrol	vertebrate	mammals	+WAPL	https://s3.amazonaws.com/hicfiles/external/wapl_hic/WT.hic
+# Afun18	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/Afun/AfunF3.18+.hic
