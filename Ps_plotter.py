@@ -83,19 +83,26 @@ def process(data):
         data[chr] = data[chr] / np.sum(data[chr])
     return data
 
-def fit_linear_regression(data, npoints = 20, step = 2):
+def fit_linear_regression(data, starting_npoints = 5,
+                          step = 1,
+                          crop_min = -1.75,
+                          crop_max = -0.05):
+
     maxdist = min([len(i) for i in data.values()])
     distances = np.log(np.arange(maxdist)*resolution+1)
     coeffs = []
     regression = LinearRegression()
 
-    assert maxdist-npoints-1 > 1
-    starts = range(1,maxdist-npoints-1, step)
+    assert maxdist-starting_npoints-1 > 1
+    starts = range(1,maxdist-starting_npoints-1, step)
 
     plot_distances = []
     local_average = []
     for st in starts:
+        npoints = min(starting_npoints + (st*resolution)//50000, 5000000 // resolution)
         end = st + npoints
+        if end >= len(distances):
+            break
         X = distances[st:end].reshape(end-st,1)
         curr_coefs = []
         for chr in data:
@@ -106,7 +113,13 @@ def fit_linear_regression(data, npoints = 20, step = 2):
         curr_coef = np.average(curr_coefs)
 
         # check that curr coef is not too different from last coeff
-        if (st*resolution > 1000000 and len(coeffs) > 5):
+        if curr_coef < crop_min or curr_coef > crop_max:
+            continue
+
+        if (st*resolution >= 50000000):
+            break
+
+        if (st*resolution > 1000000 and len(coeffs) > 5) and False:
             # check diffference
             av = np.average(coeffs[-4:-1])
             threashold = abs(av)/2
@@ -124,6 +137,36 @@ def fit_linear_regression(data, npoints = 20, step = 2):
         plot_distances.append(distances[st])
 
     return np.exp(plot_distances), np.array(coeffs)
+
+def fit_delta(data, npoints = 20, step = 2):
+    maxdist = min([len(i) for i in data.values()])
+    distances = np.log(np.arange(maxdist)*resolution+1)
+    results = []
+
+    assert maxdist-npoints-1 > 1
+    starts = range(1,maxdist-npoints*2, step)
+
+    plot_distances = []
+    for st in starts:
+        curr_coefs=[]
+        for chr in data:
+            delta = np.average([(np.log(data[chr][i])-np.log(data[chr][i+npoints]))/np.log(data[chr][i]) for i in range(st,st+npoints)])
+            curr_coefs.append(delta)
+        curr_coef = np.average(curr_coefs)
+        if curr_coef < 0:
+            results.append(abs(curr_coef))
+            plot_distances.append(distances[st])
+
+    return np.exp(plot_distances), np.array(results)
+
+def plot_ps(data):
+    maxdist = 20000000 // resolution
+    expected = data[list(data)[0]]
+    for e in data.values():
+        if len(e) > len(expected):
+            expected = e
+    distances = np.arange(1,maxdist) * resolution + 1
+    return distances, expected[1:len(distances)+1]
 
 def fit_power_low (data, npoints = 20, step = 2):
     def power_low(x, a, b):
@@ -160,38 +203,55 @@ def fit_power_low (data, npoints = 20, step = 2):
         # plt.loglog(distances[st:end], predicted)
     return plot_distances, np.array(coeffs)
 
-
 def plot(X,Y,**kwargs):
     plt.semilogx(X,Y, **kwargs)
-
-dataset = "datasets.csv"
-juicer_tools = "/home/minja/juicebox/juicer_tools_1.19.02.jar"
-resolution = 25000
 
 def row2color(row):
     colors={"Anopheles":"springgreen",
             "Drosophila":"mediumseagreen",
             "culex": "limegreen",
             "Aedes": "green",
+            "Polypedium" : "black",
             "chick":"black",
-            "mammals":"blue"}
+            "mammals":"blue"
+    }
 
-    linestyle={"CME" : ":",
-               "RaoCondensinDegron" : "-",
-               "2017Haarhuis_KO_WAPL1" : "--"}
-    if row["name"] in linestyle.keys():
-        linestyle = linestyle[row["name"]]
-    else:
-        linestyle = "-"
-    return {"color":colors[row.subtaxon],
-            "linestyle":linestyle}
+    special_styles = {
+            "CME" : {"linestyle":":"},
+            "CIE": {"marker":"*","linestyle":":"},
+
+            "RaoCondensinDegron": {"linestyle": "--"},
+            "2017Haarhuis_KO_WAPL1" : {"linestyle":"--", "marker":  "*"},
+            "2017Haarhuis_Kontrol": {"marker":  "*"},
+#            "DekkerCapH-": {"color":"red","marker" : "*", "linestyle":"--"},
+#            "DekkerCAPHControl": {"color": "red", "marker" : "*"},
+#            "DekkerCapH2-": {"color":"salmon", "marker":"^", "linestyle" : "--"},
+#            "DekkerCAPH2Control": {"color": "salmon", "marker":"^"},
+#            "DekkerSMC2-":{"color": "red"},
+#            "DekkerSMC2Control": {"color": "red", "linestyle":"--"},
+            "DekkerPrometo":{"color":"yellow"},
+
+            "DmelCAP":{"linestyle":"--"},
+            "DmelRAD": {"linestyle": ":"},
+        }
+
+    result = {"color":colors[row.subtaxon]}
+    if row["name"] in special_styles:
+        for k,v in special_styles[row["name"]].items():
+            result[k] = v
+
+    return result
+
+dataset = "datasets.csv"
+juicer_tools = "juicer/juicer_tools_1.19.02.jar"
+resolution = 10000
+report = 170
 
 datasets = pd.read_csv(dataset, sep="\t",
                        comment="#")
-
-report = 150
 # define subplots
 subplots = dict([(val,ind) for ind,val in enumerate(np.unique(datasets.taxon.values))])
+print(subplots)
 for ind in range(len(datasets)):
     row = datasets.iloc[ind]
     logging.info(row["name"])
@@ -200,8 +260,19 @@ for ind in range(len(datasets)):
     data = dump(hic,juicer_tools,resolution)
     data = process(data)
     logging.info("Fitting...")
-    #X,Y = fit_power_low(data)
-    X,Y = fit_linear_regression(data)
+    # X,Y = fit_power_low(data)
+    if row.taxon == "vertebrate":
+        crop_min = -2.2
+        crop_max = 0.1
+    else:
+        crop_min = -1.75
+        crop_max = -0.25
+
+    X,Y = fit_linear_regression(data, crop_min=crop_min, crop_max=crop_max)
+
+    # X,Y = plot_ps(data)
+    # X,Y = fit_delta(data)
+    # X, Y = plot_ps(data)
     logging.info("Plotting...")
     plt.subplot(len(subplots),1,subplots[row.taxon]+1)
     plot(X,Y,**row2color(row))
@@ -210,4 +281,4 @@ for ind in range(len(datasets)):
         #plt.show()
         break
 #plt.axhline(y=-1, ls="--")
-plt.show()
+plt.savefig("result.png",dpi=500)
