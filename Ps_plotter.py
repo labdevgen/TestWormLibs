@@ -10,6 +10,7 @@ import os
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import pickle
+from functools import reduce
 
 # dump data to .expected file or reload from cash
 def dump(file, juicerpath, resolution, minchrsize = 20000000, excludechrms = ("X","chrX",
@@ -86,7 +87,8 @@ def process(data):
 def fit_linear_regression(data, starting_npoints = 5,
                           step = 1,
                           crop_min = -1.75,
-                          crop_max = -0.05):
+                          crop_max = -0.05,
+                          max_plot_dist=50000000):
 
     maxdist = min([len(i) for i in data.values()])
     distances = np.log(np.arange(maxdist)*resolution+1)
@@ -112,12 +114,19 @@ def fit_linear_regression(data, starting_npoints = 5,
         #curr_coef = np.median(curr_coefs)
         curr_coef = np.average(curr_coefs)
 
+        if (st*resolution >= max_plot_dist):
+            break
+
         # check that curr coef is not too different from last coeff
-        if curr_coef < crop_min or curr_coef > crop_max:
+        if curr_coef < crop_min:
+            coeffs.append(crop_min)
+            plot_distances.append(distances[st])
+            continue
+        elif curr_coef > crop_max:
+            coeffs.append(crop_max)
+            plot_distances.append(distances[st])
             continue
 
-        if (st*resolution >= 50000000):
-            break
 
         if (st*resolution > 1000000 and len(coeffs) > 5) and False:
             # check diffference
@@ -159,14 +168,19 @@ def fit_delta(data, npoints = 20, step = 2):
 
     return np.exp(plot_distances), np.array(results)
 
-def plot_ps(data):
-    maxdist = 20000000 // resolution
+def plot_ps(data, maxdist=None):
+    # maxdist = 20000000 // resolution
+    if maxdist is None:
+        maxdist = min([len(i) for i in data.values()])
+    else:
+        maxdist = min([len(i) for i in data.values()]+[maxdist // resolution])
+
     expected = data[list(data)[0]]
     for e in data.values():
         if len(e) > len(expected):
             expected = e
     distances = np.arange(1,maxdist) * resolution + 1
-    return distances, expected[1:len(distances)+1]
+    return distances, np.log(expected[1:len(distances)+1]) / np.log(10)
 
 def fit_power_low (data, npoints = 20, step = 2):
     def power_low(x, a, b):
@@ -206,23 +220,49 @@ def fit_power_low (data, npoints = 20, step = 2):
 def plot(X,Y,**kwargs):
     plt.semilogx(X,Y, **kwargs)
 
+def multiplots(plots, shadow, average):
+    for p in plots.values():
+        plt.plot(p[0].X,p[0].Y,**p[1],label=p[2])
+
+    if average or shadow:
+        dfs = [p[0] for p in plots.values() if p[3] == "WT"]
+        df_final = reduce(lambda left, right: pd.merge(left, right, on='X',how="outer"), dfs)
+        X = df_final.X
+        df_final.drop(columns=["X"],inplace=True)
+
+        Ymax = df_final.apply(np.nanmax,axis=1).values
+        Ymin = df_final.apply(np.nanmin, axis=1).values
+        Yav = df_final.apply(np.nanmedian, axis=1).values
+
+    if average:
+        plt.plot(X, Yav, color="black", ls="--", linewidth=4, label="Median")
+    #plt.plot(X, Ymax, color="black", linewidth=4, legend="Min/Max")
+    #plt.plot(X, Ymin, color="black", linewidth=4)
+
+    if shadow:
+        plt.fill_between(X,Ymin,Ymax,alpha=0.1)
+
+    plt.xscale("log")
+    plt.gca().legend(loc='upper center', bbox_to_anchor=(1, -0.2), ncol = 2)
+
 def row2color(row):
     colors={"Anopheles":"springgreen",
-            "Drosophila":"mediumseagreen",
-            "culex": "limegreen",
-            "Aedes": "green",
-            "Polypedium" : "black",
-            "chick":"black",
-            "mammals":"blue"
+            "Drosophila":"springgreen",
+#            "culex": "limegreen",
+            "culex": "springgreen",
+            "Aedes": "springgreen",
+            "Polypedium" : "springgreen",
+            "chick":"springgreen",
+            "mammals":"springgreen"
     }
 
     special_styles = {
             "CME" : {"linestyle":":"},
             "CIE": {"marker":"*","linestyle":":"},
 
-            "RaoCondensinDegron": {"linestyle": "--"},
-            "2017Haarhuis_KO_WAPL1" : {"linestyle":"--", "marker":  "*"},
-            "2017Haarhuis_Kontrol": {"marker":  "*"},
+            "RaoCondensinDegron": {"color": "blue", "linewidth":2},
+#            "2017Haarhuis_KO_WAPL1" : {"linestyle":"--", "marker":  "*"},
+            "2017Haarhuis_Kontrol": {"color":  "yellow", "linewidth":2},
 #            "DekkerCapH-": {"color":"red","marker" : "*", "linestyle":"--"},
 #            "DekkerCAPHControl": {"color": "red", "marker" : "*"},
 #            "DekkerCapH2-": {"color":"salmon", "marker":"^", "linestyle" : "--"},
@@ -231,11 +271,16 @@ def row2color(row):
 #            "DekkerSMC2Control": {"color": "red", "linestyle":"--"},
             "DekkerPrometo":{"color":"yellow"},
 
-            "DmelCAP":{"linestyle":"--"},
-            "DmelRAD": {"linestyle": ":"},
-        }
+            "DmelCAP":{"linestyle":"-", "color":"red", "linewidth":2},
+            "DmelRAD": {"linestyle": "-", "color":"blue", "linewidth":2}
 
-    result = {"color":colors[row.subtaxon]}
+#        "Dvir": {"color": "white"},
+#        "Dmel": {"color": "blue"}
+#        "Dbus": {"color": "white"},
+    }
+
+    result = {"linewidth": 0.5}
+    result["color"]=colors[row.subtaxon]
     if row["name"] in special_styles:
         for k,v in special_styles[row["name"]].items():
             result[k] = v
@@ -249,36 +294,51 @@ report = 170
 
 datasets = pd.read_csv(dataset, sep="\t",
                        comment="#")
-# define subplots
-subplots = dict([(val,ind) for ind,val in enumerate(np.unique(datasets.taxon.values))])
-print(subplots)
-for ind in range(len(datasets)):
-    row = datasets.iloc[ind]
-    logging.info(row["name"])
-    hic = row.link
-    logging.info("Starting dump")
-    data = dump(hic,juicer_tools,resolution)
-    data = process(data)
-    logging.info("Fitting...")
-    # X,Y = fit_power_low(data)
-    if row.taxon == "vertebrate":
-        crop_min = -2.2
-        crop_max = 0.1
-    else:
-        crop_min = -1.75
-        crop_max = -0.25
 
-    X,Y = fit_linear_regression(data, crop_min=crop_min, crop_max=crop_max)
+analysis = {
+    "Anopheles": datasets.query("(name in ['Acol','Amer','Aste','Aalb','Aatr'])"),
+    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex')"),
+    "mammals": datasets.query("(subtaxon=='mammals')")
+}
 
-    # X,Y = plot_ps(data)
-    # X,Y = fit_delta(data)
-    # X, Y = plot_ps(data)
-    logging.info("Plotting...")
-    plt.subplot(len(subplots),1,subplots[row.taxon]+1)
-    plot(X,Y,**row2color(row))
-    logging.info("Done!")
-    if ind >= report and ind % report == 0:
-        #plt.show()
-        break
-#plt.axhline(y=-1, ls="--")
-plt.savefig("result.png",dpi=500)
+for func in ["Ps","Slope"]:
+    for suffix,species in analysis.items():
+        plots = {}
+        for ind in range(len(species)):
+            row = species.iloc[ind]
+            logging.info(row["name"])
+            hic = row.link
+            logging.info("Starting dump")
+            data = dump(hic,juicer_tools,resolution)
+            data = process(data)
+            logging.info("Fitting...")
+            # X,Y = fit_power_low(data)
+            if row.taxon == "vertebrate":
+                crop_min = -2.2
+                crop_max = 0.1
+            else:
+                crop_min = -1.75
+                crop_max = -0.25
+
+            if func == "Slope":
+                X,Y = fit_linear_regression(data, crop_min=crop_min, crop_max=crop_max, max_plot_dist=25000000)
+            elif func == "Ps":
+                X, Y = plot_ps(data)
+            else:
+                raise
+            logging.info("Plotting...")
+            plots[ind] = [pd.DataFrame({"X":X,"Y":Y}),row2color(row),row["name"],row["Genotype"]]
+            logging.info("Done!")
+            if ind >= report and ind % report == 0:
+                #plt.show()
+                break
+        multiplots(plots, shadow=(func=="Slope"), average=(func=="Slope"))
+        if func=="Slope":
+            plt.gca().set_ylabel("Slope")
+        elif func=="Ps":
+            plt.gca().set_ylabel("Log(Normed Contact probability)")
+
+        plt.gca().set_xlabel("Genomic distance")
+        plt.tight_layout()
+        plt.savefig("result_"+suffix+"_"+func+".png",dpi=500)
+        plt.clf()
