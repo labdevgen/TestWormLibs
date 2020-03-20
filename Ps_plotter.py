@@ -1,76 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-import subprocess
-import straw
 import logging
 logging.basicConfig(level = logging.INFO)
-from hashlib import md5
-import os
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-import pickle
-from functools import reduce
-
-# dump data to .expected file or reload from cash
-def dump(file, juicerpath, resolution, minchrsize = 20000000, excludechrms = ("X","chrX",
-                                                                              "Y","chrY",
-                                                                              "Z","chrZ",
-                                                                              "W","chrW")):
-    description = (file+str(resolution)+str(minchrsize)+str(excludechrms)).encode("utf-8")
-
-    hashfile = os.path.join("data/all_chr_dumps",
-                            md5(description).hexdigest())
-    if os.path.isfile(hashfile):
-        return pickle.load(open(hashfile,"rb"))
-
-    # get chrm names first
-    strawObj = straw.straw(file)
-    chrsizes = strawObj.chromDotSizes.data
-    # example:
-    # {'ALL': (0, 231617), 'X': (1, 26840812), '2R': (2, 61076761), '2L': (3, 48179558), '3R': (4, 53444961),
-    # '3L': (5, 42074947)}
-
-    if "ALL" in chrsizes:
-        del chrsizes["ALL"]
-
-    # get valid chrms
-    valid_chrms = []
-
-    for chr in chrsizes:
-        if chrsizes[chr][1] > minchrsize and \
-                not chr in excludechrms and \
-                not chr.lower() in excludechrms and \
-                not chr.upper() in excludechrms:
-            valid_chrms.append(chr)
-
-    assert len(valid_chrms) > 0
-
-    # maxlenid = sorted(chrsizes.keys(),
-    #                   key=lambda x: chrsizes[x][1],
-    #                   reverse=True)[0]
-    # valid_chrms = [maxlenid]
-    # logging.info("Using chr "+str(maxlenid)+" for file "+file)
-
-    # dump data for all valid chrms
-    data = {}
-    for chr in valid_chrms:
-        description_chr = (file+str(resolution)+str(minchrsize)+str(excludechrms)+chr).encode("utf-8")
-        chromosome_hash_file = os.path.join("data/all_chr_dumps/",
-                            md5(description_chr).hexdigest())
-        if not os.path.isfile(chromosome_hash_file):
-            command = ["java","-jar",juicerpath,"dump","expected",
-                        "KR",file,chr,"BP",str(resolution),chromosome_hash_file]
-            logging.info(" ".join(command))
-            p = subprocess.run(" ".join(command),shell=True,
-                                    stdout = subprocess.PIPE,
-                                    stderr=subprocess.PIPE,
-                                    check=True)
-        chr_data = np.loadtxt(chromosome_hash_file)
-        data[chr] = chr_data
-
-    pickle.dump(data, open(hashfile,"wb"))
-    return data
+from plot_functions import multiplots
+from Expected_calculator import dump
 
 def process(data):
     # normalize probabilities to 1
@@ -216,34 +152,6 @@ def fit_power_low (data, npoints = 20, step = 2):
         # predicted = power_low(distances[st:end], *popt)
         # plt.loglog(distances[st:end], predicted)
     return plot_distances, np.array(coeffs)
-
-def plot(X,Y,**kwargs):
-    plt.semilogx(X,Y, **kwargs)
-
-def multiplots(plots, shadow, average):
-    for p in plots.values():
-        plt.plot(p[0].X,p[0].Y,**p[1],label=p[2])
-
-    if average or shadow:
-        dfs = [p[0] for p in plots.values() if p[3] == "WT"]
-        df_final = reduce(lambda left, right: pd.merge(left, right, on='X',how="outer"), dfs)
-        X = df_final.X
-        df_final.drop(columns=["X"],inplace=True)
-
-        Ymax = df_final.apply(np.nanmax,axis=1).values
-        Ymin = df_final.apply(np.nanmin, axis=1).values
-        Yav = df_final.apply(np.nanmedian, axis=1).values
-
-    if average:
-        plt.plot(X, Yav, color="black", ls="--", linewidth=4, label="Median")
-    #plt.plot(X, Ymax, color="black", linewidth=4, legend="Min/Max")
-    #plt.plot(X, Ymin, color="black", linewidth=4)
-
-    if shadow:
-        plt.fill_between(X,Ymin,Ymax,alpha=0.1)
-
-    plt.xscale("log")
-    plt.gca().legend(loc='upper center', bbox_to_anchor=(1, -0.2), ncol = 2)
 
 def row2color(row):
     colors={"Anopheles":"springgreen",
