@@ -31,14 +31,17 @@ def get_vaid_chrms_from_straw(strawObj,
     assert len(valid_chrms) > 0
     return valid_chrms
 
+def get_dumpPath(*args, root="."):
+    description = "".join((map(str,args))).encode("utf-8")
+    return os.path.join(root,md5(description).hexdigest())
+
 # dump data to .expected file or reload from cash
 def dump(file, juicerpath, resolution, minchrsize = 20000000,
          excludechrms = ("X","chrX","Y","chrY","Z","chrZ","W","chrW")
          ):
-    description = (file+str(resolution)+str(minchrsize)+str(excludechrms)).encode("utf-8")
 
-    hashfile = os.path.join("data/all_chr_dumps",
-                            md5(description).hexdigest())
+    hashfile = get_dumpPath(file,resolution,minchrsize,excludechrms,
+                            root="data/all_chr_dumps")
     if os.path.isfile(hashfile):
         return pickle.load(open(hashfile,"rb"))
 
@@ -53,9 +56,8 @@ def dump(file, juicerpath, resolution, minchrsize = 20000000,
     # dump data for all valid chrms
     data = {}
     for chr in valid_chrms:
-        description_chr = (file+str(resolution)+str(minchrsize)+str(excludechrms)+chr).encode("utf-8")
-        chromosome_hash_file = os.path.join("data/all_chr_dumps/",
-                            md5(description_chr).hexdigest())
+        chromosome_hash_file = get_dumpPath(file,resolution,minchrsize,excludechrms,chr,
+                                            root="data/all_chr_dumps/")
         if not os.path.isfile(chromosome_hash_file):
             command = ["java","-jar",juicerpath,"dump","expected",
                         "KR",file,chr,"BP",str(resolution),chromosome_hash_file]
@@ -71,16 +73,28 @@ def dump(file, juicerpath, resolution, minchrsize = 20000000,
     return data
 
 # compute expected from the dframe st1 - st2 - E1
-def computeExpected(data):
-    pass
+def computeExpected(data, resolution):
+    result = data.groupby(by="dist").aggregate(np.nanmean)
+    # it might be that not all distance values are present. Add NaNs
+    all_possible_values =  pd.DataFrame({"all_dist":range(0,max(result.index.values)+1,
+                                                      resolution)})
+    result = result.merge(all_possible_values,left_index=True,
+                          right_on = "all_dist", how="outer").sort_index()["count"].fillna(0.)
+    return result
 
 def getExpectedByCompartments(file, juicerpath, resolution,
                               minchrsize = 20000000,
                     excludechrms = ("X","chrX","Y","chrY","Z","chrZ","W","chrW"),
                     compartments_file = None,
-                    correlation_standard = None):
-    strawObj = straw.straw(file)
+                    correlation_standard = None,
+                    save_by_chr_dumps = False):
+    dump_path = get_dumpPath([file,resolution,minchrsize,excludechrms,compartments_file,
+                                  correlation_standard],
+                             root="data/Expected_by_compartment/")
+    if os.path.isfile(dump_path):
+        return pickle.load(open(dump_path,"rb"))
 
+    strawObj = straw.straw(file)
     valid_chrms = get_vaid_chrms_from_straw(strawObj, minchrsize, excludechrms)
     if compartments_file is None:
         # compute comparmtns on the fly
@@ -93,9 +107,11 @@ def getExpectedByCompartments(file, juicerpath, resolution,
     compartments.dropna(inplace=True)
     assert len(np.unique((compartments["end"]-compartments["st"]).values))==1
     assert abs (resolution - (compartments["end"]-compartments["st"]).values[0]) <= 1
-    compartments.drop("end", inplace=True)
+    compartments.drop("end", axis="columns", inplace=True)
 
+    results = {}
     for chr in valid_chrms:
+        results[chr] = {}
         assert chr in compartments.chr.values
         # get contacts from straw
         hic_chr, X1, X2 = strawObj.chromDotSizes.figureOutEndpoints(chr)
@@ -104,14 +120,36 @@ def getExpectedByCompartments(file, juicerpath, resolution,
 
         assert matrxObj is not None
         contacts = matrxObj.getDataFromGenomeRegion(X1, X2, X1, X2)
-        contacts = pd.DataFrame(list(contacts), columns="[chr1,st1,en1,chr2,st2,en2,count]")
-        contacts = contacts.drop(["en1","en2"],inplace=True)
+        contacts = pd.DataFrame({"st1":contacts[0],"st2":contacts[1],"count":contacts[2]})
+        contacts["st1"] = contacts["st1"]*resolution
+        contacts["st2"] = contacts["st2"]*resolution
+        contacts.dropna(inplace=True)
 
         E1chr = compartments.query("chr==@chr")
 
-        contacts = contacts.merge(E1chr,how="innder",left_on="st1",right_on="st").rename(
-            columns={"E1":"E1_st"})
-        contacts = contacts.merge(E1chr,how="innder",left_on="st2",right_on="st").rename(
+        contacts = contacts.merge(E1chr,how="inner",left_on="st1",right_on="st").rename(
+            columns={"E1":"E1_st1"})
+        contacts = contacts.merge(E1chr,how="inner",left_on="st2",right_on="st").rename(
             columns={"E1":"E1_st2"})
+        contacts["dist"] = contacts["st2"]-contacts["st1"]
+        assert np.all(contacts["dist"].values >= 0)
 
         # ready to compute expected
+        A_interactions = contacts.query("E1_st1 > 0 and E1_st2 > 0")
+        B_interactions = contacts.query("E1_st1 < 0 and E1_st2 < 0")
+        AB_interactions = contacts.query("E1_st1 * E1_st2 < 0")
+
+        for label,contact_data in zip(
+                    ["A","B","AB","all"],
+                    [A_interactions,B_interactions,AB_interactions,contacts]
+                    ):
+            Exp = computeExpected(contact_data, resolution)
+            results[chr][label] = Exp.values
+
+            if save_by_chr_dumps:
+                chr_dump_path = get_dumpPath([file, resolution, minchrsize, excludechrms, compartments_file,
+                                              correlation_standard, chr, label],
+                                             root="data/Expected_by_compartment/") +"_"+ label+"_"+chr
+                Exp.to_csv(chr_dump_path,sep="\t",header=False,index=False)
+    pickle.dump(results, open(dump_path,"wb"))
+    return results

@@ -1,5 +1,5 @@
-name	taxon	subtaxon	Genotype	link
-Acol	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AcolNg/AcolNg_V3.hic
+name	taxon	subtaxon	Genotype	link	compartments
+Acol	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AcolNg/AcolNg_V3.hic	data/eig/AcolNg_V3.tpm.my.eig.bedGraph
 AmerA	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AmerR4/AmerR4_V3A.hic
 Amer	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AmerR4/AmerR4_V3.hic
 Aste	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AsteI2/AsteI2_V3.hic

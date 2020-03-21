@@ -11,12 +11,16 @@ from Expected_calculator import dump
 def process(data):
     # normalize probabilities to 1
     for chr in data:
+        # last expected values on chrms are similar
+        # let's clip expected values at this point
         t = np.subtract(data[chr][1:], data[chr][:-1])
         t = np.where(t==0)[0]
         if len(t) != 0:
             t = max(t)
             assert t > 3*len(data)/4
             data[chr] = data[chr][:t]
+
+        # now normalize the sum to 1
         data[chr] = data[chr] / np.sum(data[chr])
     return data
 
