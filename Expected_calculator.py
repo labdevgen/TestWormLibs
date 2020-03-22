@@ -97,21 +97,40 @@ def getExpectedByCompartments(file, juicerpath, resolution,
     strawObj = straw.straw(file)
     valid_chrms = get_vaid_chrms_from_straw(strawObj, minchrsize, excludechrms)
     if compartments_file is None:
-        # compute comparmtns on the fly
-        raise NotImplementedError
+        # compute compartments on the fly
+        compartments_file = get_dumpPath(file,resolution,
+                                         root="data/Expected_by_compartment/")+".E1"
+        if not os.path.isfile(compartments_file):
+            out = open(compartments_file,"w")
+            for chr in valid_chrms:
+                chr_file_dump = compartments_file+"."+chr
+                cmd=["java","-jar",juicerpath,"eigenvector","KR",
+                        file, chr,"BP",resolution,chr_file_dump]
+                print (" ".join(cmd))
+                subprocess.run(" ".join(cmd), shell=True,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               check=True)
+                lines =open(chr_file_dump).readlines()
+                out.write(lines)
 
     compartments = pd.read_csv(compartments_file,
                                sep="\t",
                                header=None,
                                names=["chr","st","end","E1"])
     compartments.dropna(inplace=True)
+    before_drop = len(compartments)
+    A_percentile = np.percentile(compartments.query("E1>=0").E1,10)
+    B_percentile = np.percentile(compartments.query("E1<=0").E1,90)
+    compartments.query("E1>=@A_percentile or E1<=@B_percentile", inplace=True)
+    after_drop = len(compartments)
+    print ("Dropped ",before_drop-after_drop," out of ",before_drop," unsertain compartmental bins")
     assert len(np.unique((compartments["end"]-compartments["st"]).values))==1
     assert abs (resolution - (compartments["end"]-compartments["st"]).values[0]) <= 1
     compartments.drop("end", axis="columns", inplace=True)
 
-    results = {}
+    results = {"A":{},"B":{},"AB":{},"all":{}}
     for chr in valid_chrms:
-        results[chr] = {}
         assert chr in compartments.chr.values
         # get contacts from straw
         hic_chr, X1, X2 = strawObj.chromDotSizes.figureOutEndpoints(chr)
@@ -144,7 +163,7 @@ def getExpectedByCompartments(file, juicerpath, resolution,
                     [A_interactions,B_interactions,AB_interactions,contacts]
                     ):
             Exp = computeExpected(contact_data, resolution)
-            results[chr][label] = Exp.values
+            results[label][chr] = Exp.values
 
             if save_by_chr_dumps:
                 chr_dump_path = get_dumpPath([file, resolution, minchrsize, excludechrms, compartments_file,

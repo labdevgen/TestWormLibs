@@ -5,7 +5,7 @@ Amer	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hi
 Aste	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AsteI2/AsteI2_V3.hic
 Aqmac	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/Aqmac/Aqmac_V3R.hic
 Aalb	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AalbS2/AalbS2_V3.hic
-Aatr	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AatrE3/AatrE3_V3.hic
+Aatr	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/AatrE3/AatrE3_V3.hic	data/eig/AatrE3_V3.tpm.my.eig.bedGraph
 Dmel	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414719_Dmel.hic
 Dbus	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414720_Dbus.hic
 Dvir	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414721_Dvir.hic
