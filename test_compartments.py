@@ -11,7 +11,7 @@ resolution = 25000
 
 datasets = pd.read_csv(dataset, sep="\t",
                        comment="#")
-row = datasets.query("name=='Acol'").iloc[0]
+row = datasets.query("name=='CME'").iloc[0]
 hic = row.link
 compartments = row.compartments
 result = getExpectedByCompartments(hic,juicer_tools,25000,compartments_file=compartments,

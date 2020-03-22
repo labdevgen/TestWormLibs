@@ -98,6 +98,7 @@ def getExpectedByCompartments(file, juicerpath, resolution,
     valid_chrms = get_vaid_chrms_from_straw(strawObj, minchrsize, excludechrms)
     if compartments_file is None:
         # compute compartments on the fly
+        raise NotImplementedError
         compartments_file = get_dumpPath(file,resolution,
                                          root="data/Expected_by_compartment/")+".E1"
         if not os.path.isfile(compartments_file):
@@ -131,7 +132,13 @@ def getExpectedByCompartments(file, juicerpath, resolution,
 
     results = {"A":{},"B":{},"AB":{},"all":{}}
     for chr in valid_chrms:
-        assert chr in compartments.chr.values
+
+        # check that E1 were computed for this chrm
+        E1chr = compartments.query("chr==@chr")
+        if len(E1chr) == 0:
+            print("Warning: no compartments for chr", chr)
+            continue
+
         # get contacts from straw
         hic_chr, X1, X2 = strawObj.chromDotSizes.figureOutEndpoints(chr)
         matrxObj = strawObj.getNormalizedMatrix(hic_chr, hic_chr, "KR",
@@ -143,8 +150,6 @@ def getExpectedByCompartments(file, juicerpath, resolution,
         contacts["st1"] = contacts["st1"]*resolution
         contacts["st2"] = contacts["st2"]*resolution
         contacts.dropna(inplace=True)
-
-        E1chr = compartments.query("chr==@chr")
 
         contacts = contacts.merge(E1chr,how="inner",left_on="st1",right_on="st").rename(
             columns={"E1":"E1_st1"})
@@ -170,5 +175,6 @@ def getExpectedByCompartments(file, juicerpath, resolution,
                                               correlation_standard, chr, label],
                                              root="data/Expected_by_compartment/") +"_"+ label+"_"+chr
                 Exp.to_csv(chr_dump_path,sep="\t",header=False,index=False)
+    assert len(results) != 0
     pickle.dump(results, open(dump_path,"wb"))
     return results

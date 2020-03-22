@@ -15,7 +15,7 @@ DmelCAP	insect	Drosophila	CAPH-	https://genedev.bionet.nsc.ru/site/hic_out/Droso
 DmelRAD	insect	Drosophila	RAD-	https://genedev.bionet.nsc.ru/site/hic_out/Drosophilla/hic/Dmel_RAD.hic
 Polypedium	insect	Polypedium	WT	https://genedev.bionet.nsc.ru/site/hic_out/Polypedium/Pv5.0_all.hic
 ChEF	vertebrate	chick	WT	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChEF.hic
-CME	vertebrate	chick	CME	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChME.hic
+CME	vertebrate	chick	CME	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChME.hic	data/eig/CME.chr10.bedGraph
 CIE	vertebrate	chick	CIE	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChIE.hic
 Aacr	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaCR_1_allValidPairs.hic
 AaU	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaU_3.hic
