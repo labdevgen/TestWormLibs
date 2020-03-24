@@ -8,7 +8,8 @@ import numpy as np
 
 def get_vaid_chrms_from_straw(strawObj,
                             minchrsize,
-                            excludechrms):
+                            excludechrms,
+                            maxchrsize=1000000000000):
     # get chrm names first
     chrsizes = strawObj.chromDotSizes.data
     # example:
@@ -23,6 +24,7 @@ def get_vaid_chrms_from_straw(strawObj,
 
     for chr in chrsizes:
         if chrsizes[chr][1] > minchrsize and \
+                chrsizes[chr][1] < maxchrsize and \
                 not chr in excludechrms and \
                 not chr.lower() in excludechrms and \
                 not chr.upper() in excludechrms:
@@ -76,7 +78,11 @@ def dump(file, juicerpath, resolution, minchrsize = 20000000,
 def computeExpected(data, resolution):
     result = data.groupby(by="dist").aggregate(np.nanmean)
     # it might be that not all distance values are present. Add NaNs
-    all_possible_values =  pd.DataFrame({"all_dist":range(0,max(result.index.values)+1,
+    print(result.head())
+    print(result.dtypes)
+
+    print(resolution)
+    all_possible_values = pd.DataFrame({"all_dist":range(0,int(max(result.index.values))+1,
                                                       resolution)})
     result = result.merge(all_possible_values,left_index=True,
                           right_on = "all_dist", how="outer").sort_index()["count"].fillna(0.)
@@ -84,36 +90,50 @@ def computeExpected(data, resolution):
 
 def getExpectedByCompartments(file, juicerpath, resolution,
                               minchrsize = 20000000,
+                              maxchrsize = 150000000,
                     excludechrms = ("X","chrX","Y","chrY","Z","chrZ","W","chrW"),
                     compartments_file = None,
                     correlation_standard = None,
                     save_by_chr_dumps = False):
+    if pd.isnull(compartments_file) or pd.isna(compartments_file):
+        compartments_file = None
     dump_path = get_dumpPath([file,resolution,minchrsize,excludechrms,compartments_file,
                                   correlation_standard],
                              root="data/Expected_by_compartment/")
     if os.path.isfile(dump_path):
         return pickle.load(open(dump_path,"rb"))
 
-    strawObj = straw.straw(file)
-    valid_chrms = get_vaid_chrms_from_straw(strawObj, minchrsize, excludechrms)
+    all_expected_hashfile = get_dumpPath(file,resolution,minchrsize,excludechrms,
+                            root="data/all_chr_dumps")
+
+
+    # it takes a long time to get list of chrms frow hic-files located in cloud
+    # let's try to load it from expected dumps
+    if os.path.isfile(all_expected_hashfile) and compartments_file is not None:
+        valid_chrms=list(pickle.load(open(all_expected_hashfile,"rb")).keys())
+    else:
+        strawObj = straw.straw(file)
+        valid_chrms = get_vaid_chrms_from_straw(strawObj, minchrsize, excludechrms)
+
     if compartments_file is None:
         # compute compartments on the fly
-        raise NotImplementedError
         compartments_file = get_dumpPath(file,resolution,
                                          root="data/Expected_by_compartment/")+".E1"
         if not os.path.isfile(compartments_file):
-            out = open(compartments_file,"w")
+            out = open(compartments_file,"a")
             for chr in valid_chrms:
-                chr_file_dump = compartments_file+"."+chr
-                cmd=["java","-jar",juicerpath,"eigenvector","KR",
-                        file, chr,"BP",resolution,chr_file_dump]
+                chr_file_dump = compartments_file+"."+chr+".juicerout"
+                cmd=list(map(str,["java","-jar",juicerpath,"eigenvector","-p","KR",
+                        file, chr,"BP",resolution,chr_file_dump]))
                 print (" ".join(cmd))
                 subprocess.run(" ".join(cmd), shell=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                check=True)
-                lines =open(chr_file_dump).readlines()
-                out.write(lines)
+                lines=open(chr_file_dump).readlines()
+                for ind,val in enumerate(lines):
+                    out.write(str(ind*resolution) +"\t"+str((ind+1)*resolution) + "\t" + val)
+                out.write("\n")
 
     compartments = pd.read_csv(compartments_file,
                                sep="\t",
@@ -132,7 +152,7 @@ def getExpectedByCompartments(file, juicerpath, resolution,
 
     results = {"A":{},"B":{},"AB":{},"all":{}}
     for chr in valid_chrms:
-
+        print ("Processing chromosome ",chr)
         # check that E1 were computed for this chrm
         E1chr = compartments.query("chr==@chr")
         if len(E1chr) == 0:
@@ -140,22 +160,39 @@ def getExpectedByCompartments(file, juicerpath, resolution,
             continue
 
         # get contacts from straw
-        hic_chr, X1, X2 = strawObj.chromDotSizes.figureOutEndpoints(chr)
-        matrxObj = strawObj.getNormalizedMatrix(hic_chr, hic_chr, "KR",
-                                                "BP", resolution)
+        # hic_chr, X1, X2 = strawObj.chromDotSizes.figureOutEndpoints(chr)
+        # matrxObj = strawObj.getNormalizedMatrix(hic_chr, hic_chr, "KR",
+        #                                         "BP", resolution)
+        #
+        # assert matrxObj is not None
+        # contacts = matrxObj.getDataFromGenomeRegion(X1, X2, X1, X2)
+        # contacts = pd.DataFrame({"st1":contacts[0],"st2":contacts[1],"count":contacts[2]})
+        # contacts["st1"] = contacts["st1"]*resolution
+        # contacts["st2"] = contacts["st2"]*resolution
+        # contacts.dropna(inplace=True)
 
-        assert matrxObj is not None
-        contacts = matrxObj.getDataFromGenomeRegion(X1, X2, X1, X2)
-        contacts = pd.DataFrame({"st1":contacts[0],"st2":contacts[1],"count":contacts[2]})
-        contacts["st1"] = contacts["st1"]*resolution
-        contacts["st2"] = contacts["st2"]*resolution
-        contacts.dropna(inplace=True)
-
+        command = ["java", "-jar", juicerpath, "dump", "observed",
+                   "KR", file, chr, chr, "BP", str(resolution), "temp.contacts"]
+        print(" ".join(command))
+        try:
+            subprocess.run(" ".join(command), shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           check=True)
+        except CalledProcessError as e:
+            print(e)
+            exit(1)
+        contacts = pd.read_csv("temp.contacts",sep="\t",header=None,names=["st1","st2","count"],
+                               dtype={"st1":np.uint32,"st2":np.uint32,"count":np.float64})
+        print (contacts.dtypes)
         contacts = contacts.merge(E1chr,how="inner",left_on="st1",right_on="st").rename(
             columns={"E1":"E1_st1"})
+        print (contacts.dtypes)
         contacts = contacts.merge(E1chr,how="inner",left_on="st2",right_on="st").rename(
             columns={"E1":"E1_st2"})
+        print (contacts.dtypes)
         contacts["dist"] = contacts["st2"]-contacts["st1"]
+        print (contacts.dtypes)
         assert np.all(contacts["dist"].values >= 0)
 
         # ready to compute expected

@@ -35,23 +35,24 @@ def row2color(row):
     }
 
     special_styles = {
-            "CME" : {"linestyle":":"},
+            "CME" : {"linestyle": "-", "color":"blue", "linewidth":2},
             "CIE": {"marker":"*","linestyle":":"},
 
             "RaoCondensinDegron": {"color": "blue", "linewidth":2},
-#            "2017Haarhuis_KO_WAPL1" : {"linestyle":"--", "marker":  "*"},
-            "2017Haarhuis_Kontrol": {"color":  "yellow", "linewidth":2},
+            "2017Haarhuis_KO_WAPL1" : {"color":  "red",  "linewidth":2},
+            "2017Haarhuis_Kontrol": {"color":  "red", "linestyle":"--", "linewidth":0.5},
 #            "DekkerCapH-": {"color":"red","marker" : "*", "linestyle":"--"},
 #            "DekkerCAPHControl": {"color": "red", "marker" : "*"},
 #            "DekkerCapH2-": {"color":"salmon", "marker":"^", "linestyle" : "--"},
 #            "DekkerCAPH2Control": {"color": "salmon", "marker":"^"},
 #            "DekkerSMC2-":{"color": "red"},
 #            "DekkerSMC2Control": {"color": "red", "linestyle":"--"},
-            "DekkerPrometo":{"color":"yellow"},
-
+            "DekkerPrometo":{"color":"yellow", "linewidth":2},
+            "DekkerSMC2-":{"linestyle":"-", "color":"red", "linewidth":2},
+            "DekkerCapH-":{"linestyle":"--", "color":"red", "linewidth":1},
+            "DekkerCapH2-":{"linestyle":":", "color":"red", "linewidth":1},
             "DmelCAP":{"linestyle":"-", "color":"red", "linewidth":2},
             "DmelRAD": {"linestyle": "-", "color":"blue", "linewidth":2}
-
 #        "Dvir": {"color": "white"},
 #        "Dmel": {"color": "blue"}
 #        "Dbus": {"color": "white"},
@@ -74,9 +75,10 @@ datasets = pd.read_csv(dataset, sep="\t",
                        comment="#")
 
 analysis = {
-    "Anopheles": datasets.query("(name in ['Acol','Amer','Aste','Aalb','Aatr'])"),
-    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex')"),
-    "mammals": datasets.query("(subtaxon=='mammals')")
+#    "Anopheles": datasets.query("(name in ['Acol','Amer','Aste','Aalb','Aatr'])"),
+#    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex')"),
+    "mammals": datasets.query("(subtaxon=='mammals')"),
+    "chicken": datasets.query("(subtaxon=='chicken')")
 }
 
 for func in ["Ps","Slope"]:
@@ -94,13 +96,15 @@ for func in ["Ps","Slope"]:
             if row.taxon == "vertebrate":
                 crop_min = -2.2
                 crop_max = 0.1
+                max_plot_dist = 35000000
             else:
                 crop_min = -1.75
                 crop_max = -0.25
+                max_plot_dist = 25000000
 
             if func == "Slope":
                 X,Y = fit_linear_regression(data, resolution=resolution,
-                                            crop_min=crop_min, crop_max=crop_max, max_plot_dist=25000000)
+                                            crop_min=crop_min, crop_max=crop_max, max_plot_dist=max_plot_dist)
             elif func == "Ps":
                 X, Y = plot_ps(data, resolution=resolution)
             else:

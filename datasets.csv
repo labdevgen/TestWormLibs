@@ -16,10 +16,10 @@ DmelRAD	insect	Drosophila	RAD-	https://genedev.bionet.nsc.ru/site/hic_out/Drosop
 Polypedium	insect	Polypedium	WT	https://genedev.bionet.nsc.ru/site/hic_out/Polypedium/Pv5.0_all.hic
 ChEF	vertebrate	chick	WT	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChEF.hic
 CME	vertebrate	chick	CME	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChME.hic	data/eig/CME.chr10.bedGraph
-CIE	vertebrate	chick	CIE	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChIE.hic
+#CIE	vertebrate	chick	CIE	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChIE.hic
 Aacr	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaCR_1_allValidPairs.hic
 AaU	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaU_3.hic
-BonevNPC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/NPC_mapq30.hic
+BonevNPC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/NPC_mapq30.hic	data/eig/chr10_bonev_NPC
 BonevmESC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/ES_mapq30.hic
 PhansteynMonocytes	vertebrate	mammals	WT	https://s3.amazonaws.com/hicfiles/external/phanstiel/updated_O/Snyder_O.hic
 RaoCondensinUntreated	vertebrate	mammals	WT	https://s3.amazonaws.com/hicfiles/hiseq/degron/untreated/unsynchronized/combined.hic
