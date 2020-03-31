@@ -1,6 +1,7 @@
 from scipy.optimize import curve_fit
 from sklearn.linear_model import LinearRegression
 import numpy as np
+import math
 
 def fit_linear_regression(data, resolution,
                           starting_npoints = 5,
@@ -100,6 +101,33 @@ def plot_ps(data, resolution, maxdist=None):
             expected = e
     distances = np.arange(1,maxdist) * resolution + 1
     return distances, np.log(expected[1:len(distances)+1]) / np.log(10)
+
+def fit_ps_log_bins(data,resolution, logbase1 = 2, logbase2 = 2, maxdist=None):
+    if maxdist is None:
+        maxdist = min([len(i) for i in data.values()])
+    else:
+        maxdist = min([len(i) for i in data.values()]+[maxdist // resolution])
+    print (maxdist)
+    expected = data[list(data)[0]]
+    for e in data.values():
+        if len(e) > len(expected):
+            expected = e
+
+    Xs = [0]
+    diffs = [1]
+    next_bin = 1
+    while next_bin <= maxdist:
+        Xs.append(next_bin)
+        if next_bin < maxdist // 10:
+            next_bin = int(round(next_bin*logbase1))
+            diff = 1
+        else:
+            next_bin = int(round(next_bin*logbase2))
+            diff = int(round(next_bin*logbase2))
+
+    assert Xs[-1] < maxdist
+    Ys = [sum(expected[Xs[i-1]:Xs[i]]) for i in range(1,len(Xs))]
+    return np.array(Xs[1:])*resolution, Ys
 
 def fit_power_low (data, npoints = 20, step = 2):
     def power_low(x, a, b):

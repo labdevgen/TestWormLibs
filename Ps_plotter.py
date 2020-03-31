@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import logging
 logging.basicConfig(level = logging.INFO)
 import pandas as pd
-from fit_functions import plot_ps, fit_linear_regression
-from plot_functions import multiplots
+from fit_functions import plot_ps, fit_linear_regression, fit_ps_log_bins
+from plot_functions import multiplots, multiplot_with_subplots
 from Expected_calculator import dump
 
 def process(data):
@@ -38,9 +38,14 @@ def row2color(row):
             "CME" : {"linestyle": "-", "color":"blue", "linewidth":2},
             "CIE": {"marker":"*","linestyle":":"},
 
+            "Aedes": {"color":"orange", "linewidth":1},
+            "Culex": {"color": "lightseagreen","linewidth":1},
             "RaoCondensinDegron": {"color": "blue", "linewidth":2},
             "2017Haarhuis_KO_WAPL1" : {"color":  "red",  "linewidth":2},
             "2017Haarhuis_Kontrol": {"color":  "red", "linestyle":"--", "linewidth":0.5},
+            "LiverTAM": {"color": "yellow", "linestyle": "--", "linewidth": 1},
+            "LiverNipbl": {"color": "red", "linestyle": "--", "linewidth": 1},
+            "BonevCN":{"color":"purple"},
 #            "DekkerCapH-": {"color":"red","marker" : "*", "linestyle":"--"},
 #            "DekkerCAPHControl": {"color": "red", "marker" : "*"},
 #            "DekkerCapH2-": {"color":"salmon", "marker":"^", "linestyle" : "--"},
@@ -52,7 +57,11 @@ def row2color(row):
             "DekkerCapH-":{"linestyle":"--", "color":"red", "linewidth":1},
             "DekkerCapH2-":{"linestyle":":", "color":"red", "linewidth":1},
             "DmelCAP":{"linestyle":"-", "color":"red", "linewidth":2},
-            "DmelRAD": {"linestyle": "-", "color":"blue", "linewidth":2}
+            "DmelRAD": {"linestyle": "-", "color":"blue", "linewidth":2},
+#            "SextonDrosophila":{"linestyle": "-", "color":"black"},
+#            "Kc167rowley": {"linestyle": "-", "color": "blue"},
+#            "S2": {"linestyle": "-", "color": "red"},
+#            "S2HeatShock": {"linestyle": "--", "color": "red"}
 #        "Dvir": {"color": "white"},
 #        "Dmel": {"color": "blue"}
 #        "Dbus": {"color": "white"},
@@ -76,12 +85,20 @@ datasets = pd.read_csv(dataset, sep="\t",
 
 analysis = {
 #    "Anopheles": datasets.query("(name in ['Acol','Amer','Aste','Aalb','Aatr'])"),
-#    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex')"),
-    "mammals": datasets.query("(subtaxon=='mammals')"),
-    "chicken": datasets.query("(subtaxon=='chicken')")
+    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex' or name=='Aedes')")
+#    "mammals": datasets.query("(subtaxon=='mammals')")
+#    "chicken": datasets.query("(subtaxon=='chick')")
+#    "Nipbl": datasets.query("(name in ['LiverWT','LiverTAM','LiverNipbl'])")
+#    "Aedes":  datasets.query("name=='Aedes'")
+#    "mammals_test": datasets.query("(name=='BonevNPC')")
 }
 
-for func in ["Ps","Slope"]:
+multuplot = False # draw all graphs on one plot or draw multiple subplots
+
+#for func in ["Ps_log"]:
+#for func in ["Ps"]:
+for func in ["Slope"]:
+#for func in ["Ps","Slope"]:
     for suffix,species in analysis.items():
         plots = {}
         for ind in range(len(species)):
@@ -97,16 +114,20 @@ for func in ["Ps","Slope"]:
                 crop_min = -2.2
                 crop_max = 0.1
                 max_plot_dist = 35000000
+#                max_plot_dist = 350000000
             else:
                 crop_min = -1.75
                 crop_max = -0.25
                 max_plot_dist = 25000000
+#                max_plot_dist = 45000000
 
             if func == "Slope":
                 X,Y = fit_linear_regression(data, resolution=resolution,
                                             crop_min=crop_min, crop_max=crop_max, max_plot_dist=max_plot_dist)
             elif func == "Ps":
                 X, Y = plot_ps(data, resolution=resolution)
+            elif func == "Ps_log":
+                X, Y = fit_ps_log_bins(data, resolution=resolution, logbase1 = 1.8, logbase2= 1.8)
             else:
                 raise
             logging.info("Plotting...")
@@ -115,13 +136,17 @@ for func in ["Ps","Slope"]:
             if ind >= report and ind % report == 0:
                 #plt.show()
                 break
-        multiplots(plots, shadow=(func=="Slope"), average=(func=="Slope"))
-        if func=="Slope":
-            plt.gca().set_ylabel("Slope")
-        elif func=="Ps":
-            plt.gca().set_ylabel("Log(Normed Contact probability)")
+        if multuplot:
+            #multiplots(plots, shadow=(func=="Slope"), average=(func=="Slope"))
+            #multiplots(plots, shadow=False, average=False)
+            if func=="Slope":
+                plt.gca().set_ylabel("Slope")
+            elif func=="Ps":
+                plt.gca().set_ylabel("Log(Normed Contact probability)")
 
-        plt.gca().set_xlabel("Genomic distance")
+            plt.gca().set_xlabel("Genomic distance")
+        else:
+            multiplot_with_subplots(plots, xlabel="Genomic distance", y_label="Slope")
         plt.tight_layout()
-        plt.savefig("result_"+suffix+"_"+func+".png",dpi=500)
+        plt.savefig("result_"+suffix+"_"+func+"_"+str(multuplot)+".png",dpi=500)
         plt.clf()

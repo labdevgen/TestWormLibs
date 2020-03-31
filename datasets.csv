@@ -10,7 +10,11 @@ Dmel	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_e
 Dbus	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414720_Dbus.hic
 Dvir	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414721_Dvir.hic
 Kc167	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/eagen/GSE89112_Kc167combined.hic
-Culex	insect	culex	WT	https://genedev.bionet.nsc.ru/site/hic_out/culex/Culex/culex3.allValidPairs.hic
+SextonDrosophila	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/sexton/combined.hic
+Kc167rowley	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/rowley/Kc167_DpnII_HinfI_combo.hic
+S2	insect	Drosophila	WT	https://data.4dnucleome.org/files-processed/4DNFIOTPSS3L/@@download/4DNFIOTPSS3L.hic
+#S2HeatShock	insect	Drosophila	HShock	https://data.4dnucleome.org/files-processed/4DNFI525PKU5/@@download/4DNFI525PKU5.hic
+#Culex	insect	culex	Culex	https://genedev.bionet.nsc.ru/site/hic_out/culex/Culex/culex3.allValidPairs.hic
 DmelCAP	insect	Drosophila	CAPH-	https://genedev.bionet.nsc.ru/site/hic_out/Drosophilla/hic/Dmel_CAP.hic
 DmelRAD	insect	Drosophila	RAD-	https://genedev.bionet.nsc.ru/site/hic_out/Drosophilla/hic/Dmel_RAD.hic
 Polypedium	insect	Polypedium	WT	https://genedev.bionet.nsc.ru/site/hic_out/Polypedium/Pv5.0_all.hic
@@ -19,6 +23,7 @@ CME	vertebrate	chick	CME	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChME
 #CIE	vertebrate	chick	CIE	https://genedev.bionet.nsc.ru/site/hic_out/Chicken/ChIE.hic
 Aacr	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaCR_1_allValidPairs.hic
 AaU	insect	Aedes	WT	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/AaU_3.hic
+Aedes	insect	Aedes	Aedes	https://genedev.bionet.nsc.ru/site/hic_out/Aedes/Aedes_aegypti/GSE113256_mega_30.hic
 BonevNPC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/NPC_mapq30.hic	data/eig/chr10_bonev_NPC
 BonevmESC	vertebrate	mammals	WT	https://hicfiles.s3.amazonaws.com/external/bonev/ES_mapq30.hic
 PhansteynMonocytes	vertebrate	mammals	WT	https://s3.amazonaws.com/hicfiles/external/phanstiel/updated_O/Snyder_O.hic
@@ -37,3 +42,6 @@ BonevCN	vertebrate	mammals	WT	http://hicfiles.s3.amazonaws.com/external/bonev/CN
 MNAseESC	vertebrate	mammals	WT	https://data.4dnucleome.org/files-processed/4DNFI2TK7L2F/@@download/4DNFI2TK7L2F.hic
 MNAseHFF	vertebrate	mammals	WT	https://data.4dnucleome.org/files-processed/4DNFIPC7P27B/@@download/4DNFIPC7P27B.hic
 #	Afun18	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hic/Afun/AfunF3.18+.hic
+LiverWT	vertebrate	mammals	WT	https://genedev.bionet.nsc.ru/site/hic_out/Nipbl_knockout_liver/UNTR.10kb.h5.ginteractions.tsv.pre.hic
+LiverTAM	vertebrate	mammals	WT	https://genedev.bionet.nsc.ru/site/hic_out/Nipbl_knockout_liver/GSE93431_TAM.10kb.cool.HDF5.ginteractions.tsv.pre.hic
+LiverNipbl	vertebrate	mammals	Nipbl	https://genedev.bionet.nsc.ru/site/hic_out/Nipbl_knockout_liver/GSE93431_NIPBL.10kb.cool.HDF5.ginteractions.tsv.pre.hic

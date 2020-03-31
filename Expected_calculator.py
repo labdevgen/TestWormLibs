@@ -5,6 +5,7 @@ import os
 from hashlib import md5
 import pandas as pd
 import numpy as np
+import logging
 
 def get_vaid_chrms_from_straw(strawObj,
                             minchrsize,
