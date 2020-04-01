@@ -45,18 +45,18 @@ def multiplots(plots, shadow, average, logx = True):
 
 
 def multiplot_with_subplots(plots, xlabel, y_label):
-    ncols = 3
-    nrows = len(plots.values()) // ncols
+    nrows = 3
+    ncols = len(plots.values()) // nrows
     if ncols*nrows < len(plots.values()):
-        nrows += 1
+        ncols += 1
     for ind, p in enumerate(plots.values()):
         plt.subplot(nrows, ncols, ind+1)
         plt.plot(p[0].X,p[0].Y,**p[1],label=p[2])
         plt.axhline(y=-1,ls="--",color="k")
-        plt.annotate(p[2], xy=(0.05, 0.95), size=8, xycoords="axes fraction",
+        plt.annotate(p[2], xy=(0.05, 0.95), size=6, xycoords="axes fraction",
                     horizontalalignment='left', verticalalignment='top')
         plt.xscale("log")
-        plt.gca().tick_params(axis='both', which='major', labelsize=6)
+        plt.gca().tick_params(axis='both', which='major', labelsize=4)
         plt.gca().tick_params(axis='both', which='minor', labelsize=5)
         # Shrink current axis's height by 10% on the bottom
 #        box = ax.get_position()
@@ -64,5 +64,5 @@ def multiplot_with_subplots(plots, xlabel, y_label):
 #                         box.width, box.height * 0.9])
         # Put a legend below current axis
         # ax.legend(loc='upper left', fontsize="xx-small", frameon=False)#, bbox_to_anchor=(0.5, -0.05))
-        plt.xlabel(xlabel, fontdict={"size":"x-small"})
-        plt.ylabel(y_label, fontdict={"size":"x-small"})
+        plt.xlabel(xlabel, fontdict={"size":"xx-small"})
+        plt.ylabel(y_label, fontdict={"size":"xx-small"})

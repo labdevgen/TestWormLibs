@@ -9,8 +9,8 @@ Aatr	insect	Anopheles	WT	https://genedev.bionet.nsc.ru/site/hic_out/Anopheles/hi
 Dmel_Renschler	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414719_Dmel.hic
 Dmel_3-4h	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/HugetAL_Zelda_Dmel/Hug2017_3-4h_all_5k.mcool.ginteractions.tsv.pre.hic
 Dmel_c12	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/HugetAL_Zelda_Dmel/Hug2017_c12_all_5k.mcool.ginteractions.tsv.pre.hic
-#Dmel_c13	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/HugetAL_Zelda_Dmel/
-#Dmel_mitotic	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/HugetAL_Zelda_Dmel/
+Dmel_c13	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/HugetAL_Zelda_Dmel/Hug2017_c13_all_5k.mcool.ginteractions.tsv.pre.hic
+Dmel_mitotic	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/HugetAL_Zelda_Dmel/Hug2017_mitotic_all_5k.mcool.ginteractions.tsv.pre.hic
 Dbus	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414720_Dbus.hic
 Dvir	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Renschler_et_al_dmel/GSM3414721_Dvir.hic
 Kc_Eagen	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/eagen/GSE89112_Kc167combined.hic
