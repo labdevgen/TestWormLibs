@@ -85,8 +85,9 @@ datasets = pd.read_csv(dataset, sep="\t",
 
 analysis = {
 #    "Anopheles": datasets.query("(name in ['Acol','Amer','Aste','Aalb','Aatr'])"),
+#    "test": datasets.query("(name in ['Acol','Amer'])")
     "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex' or name=='Aedes')")
-#    "mammals": datasets.query("(subtaxon=='mammals')")
+#    "mammals": datasets.query("(subtaxon=='mammals')"),
 #    "chicken": datasets.query("(subtaxon=='chick')")
 #    "Nipbl": datasets.query("(name in ['LiverWT','LiverTAM','LiverNipbl'])")
 #    "Aedes":  datasets.query("name=='Aedes'")
