@@ -17,6 +17,7 @@ Kc_Eagen	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/eagen/G
 Dmel_Sexton	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/sexton/combined.hic
 Kc_Rowley	insect	Drosophila	WT	https://hicfiles.s3.amazonaws.com/external/rowley/Kc167_DpnII_HinfI_combo.hic
 S2	insect	Drosophila	WT	https://data.4dnucleome.org/files-processed/4DNFIOTPSS3L/@@download/4DNFIOTPSS3L.hic
+BG3	insect	Drosophila	WT	https://genedev.bionet.nsc.ru/site/hic_out/Drosophilla/Chathoth_BG3/aligned/Chathoth_BG3_dmel_30.hic
 #S2_HS	insect	Drosophila	HShock	https://data.4dnucleome.org/files-processed/4DNFI525PKU5/@@download/4DNFI525PKU5.hic
 #Culex	insect	culex	Culex	https://genedev.bionet.nsc.ru/site/hic_out/culex/Culex/culex3.allValidPairs.hic
 DmelCAP	insect	Drosophila	CAPH-	https://genedev.bionet.nsc.ru/site/hic_out/Drosophilla/hic/Dmel_CAP.hic
@@ -49,3 +50,46 @@ MNAseHFF	vertebrate	mammals	WT	https://data.4dnucleome.org/files-processed/4DNFI
 LiverWT	vertebrate	mammals	WT	https://genedev.bionet.nsc.ru/site/hic_out/Nipbl_knockout_liver/UNTR.10kb.h5.ginteractions.tsv.pre.hic
 LiverTAM	vertebrate	mammals	WT	https://genedev.bionet.nsc.ru/site/hic_out/Nipbl_knockout_liver/GSE93431_TAM.10kb.cool.HDF5.ginteractions.tsv.pre.hic
 LiverNipbl	vertebrate	mammals	Nipbl	https://genedev.bionet.nsc.ru/site/hic_out/Nipbl_knockout_liver/GSE93431_NIPBL.10kb.cool.HDF5.ginteractions.tsv.pre.hic
+# All Dekker (Gibcus et al.) datasets:
+unsorted DT40 cells	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIC1CLPK7/@@download/4DNFIC1CLPK7.hic
+2.5m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFI9IIO5PW/@@download/4DNFI9IIO5PW.hic
+5m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIQ74RSUY/@@download/4DNFIQ74RSUY.hic
+5m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIWTZHB4H/@@download/4DNFIWTZHB4H.hic
+7.5m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIWKR8FP6/@@download/4DNFIWKR8FP6.hic
+8m post G2 block, CAPH-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIUBM6QK8/@@download/4DNFIUBM6QK8.hic
+8m post G2 block, CAPH2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIANHFY16/@@download/4DNFIANHFY16.hic
+10m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIUY3J7EW/@@download/4DNFIUY3J7EW.hic
+10m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIRRSC7P9/@@download/4DNFIRRSC7P9.hic
+10m post G2 block, CAPH-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFI88HXX7D/@@download/4DNFI88HXX7D.hic
+10m post G2 block, CAPH2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIVIXVUK7/@@download/4DNFIVIXVUK7.hic
+10m post G2 block, SMC2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIUDPGHO8/@@download/4DNFIUDPGHO8.hic
+10m post G2 block, SMC2-, GFP-ve sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIN5NLS49/@@download/4DNFIN5NLS49.hic
+15m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIQ5CCESJ/@@download/4DNFIQ5CCESJ.hic
+15m post G2 block, FACS sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFITMQRXB7/@@download/4DNFITMQRXB7.hic
+15m post G2 block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIQ5CCESJ/@@download/4DNFIQ5CCESJ.hic
+15m post G2 block, FACS sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFITMQRXB7/@@download/4DNFITMQRXB7.hic
+15m post G2 block, CAPH-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFI2111XQA/@@download/4DNFI2111XQA.hic
+15m post G2 block, CAPH2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFINKEDSBF/@@download/4DNFINKEDSBF.hic
+30m post G2-block	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFI7YRXKEO/@@download/4DNFI7YRXKEO.hic
+30m post G2 block, CAPH-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIVLN8WJE/@@download/4DNFIVLN8WJE.hic
+30m post G2 block, CAPH2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIOWGA9AX/@@download/4DNFIOWGA9AX.hic
+30m post G2-block, nocodazole treated	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIFATZWPD/@@download/4DNFIFATZWPD.hic
+30m post G2 block, nocodazole treated, FACS sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIVBWPFD7/@@download/4DNFIVBWPFD7.hic
+45m post G2 block, SMC2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIYUR29KO/@@download/4DNFIYUR29KO.hic
+45m post G2 block, SMC2-, GFP-ve sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIKMKN736/@@download/4DNFIKMKN736.hic
+60m post G2-block, nocodazole treated	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIENYQCDP/@@download/4DNFIENYQCDP.hic
+60m post G2 block, nocodazole treated, FACS sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFISNC3LAI/@@download/4DNFISNC3LAI.hic
+60m post G2 block, nocodazole treated, CAPH-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIOLKEOME/@@download/4DNFIOLKEOME.hic
+60m post G2 block, nocodazole treated, CAPH2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIS9YPJ3L/@@download/4DNFIS9YPJ3L.hic
+75m post G2 block, nocodazole treated, SMC2-	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFID56VJGW/@@download/4DNFID56VJGW.hic
+75m post G2 block, nocodazole treated, SMC2-, GFP-ve sorted	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFICMPHDMI/@@download/4DNFICMPHDMI.hic
+G2	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFI8WGJG19/@@download/4DNFI8WGJG19.hic
+G2	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIRKUYKP4/@@download/4DNFIRKUYKP4.hic
+G2 (FACS sorted)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIUYD3HBY/@@download/4DNFIUYD3HBY.hic
+G2 (CAPH+)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIF7Q43N4/@@download/4DNFIF7Q43N4.hic
+G2 (CAPH-)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIVILEERC/@@download/4DNFIVILEERC.hic
+G2 (CAPH2+)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIG3YQQ4V/@@download/4DNFIG3YQQ4V.hic
+G2 (CAPH2-)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIJ67ZFBI/@@download/4DNFIJ67ZFBI.hic
+G2 (SMC2+)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFISWC2N8T/@@download/4DNFISWC2N8T.hic
+G2 (SMC2-depleted, FACS sorted)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFI4P8UBRL/@@download/4DNFI4P8UBRL.hic
+G2 (elutriated)	vertebrate	chick_Dekker	Dekker	https://data.4dnucleome.org/files-processed/4DNFIAQDBJZP/@@download/4DNFIAQDBJZP.hic

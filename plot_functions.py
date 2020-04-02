@@ -54,7 +54,7 @@ def multiplot_with_subplots(plots, xlabel, y_label):
         plt.subplot(nrows, ncols, ind+1)
         plt.plot(p[0].X,p[0].Y,**p[1],label=p[2])
         plt.axhline(y=-1,ls="--",color="k")
-        plt.annotate(p[2], xy=(0.05, 0.95), size=10, xycoords="axes fraction",
+        plt.annotate(p[2], xy=(0.05, 0.95), size=14, xycoords="axes fraction",
                     horizontalalignment='left', verticalalignment='top')
         plt.xscale("log")
         plt.gca().tick_params(axis='both', which='major', labelsize=8)

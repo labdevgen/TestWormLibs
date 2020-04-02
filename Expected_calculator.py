@@ -65,10 +65,18 @@ def dump(file, juicerpath, resolution, minchrsize = 20000000,
             command = ["java","-jar",juicerpath,"dump","expected",
                         "KR",file,chr,"BP",str(resolution),chromosome_hash_file]
             logging.info(" ".join(command))
-            p = subprocess.run(" ".join(command),shell=True,
+            retrie_number = 0
+            while retrie_number < 10:
+                try:
+                    p = subprocess.run(" ".join(command),shell=True,
                                     stdout = subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     check=True)
+                    break
+                except subprocess.CalledProcessError as e:
+                    print(e.output)
+                    retrie_number += 1
+
         chr_data = np.loadtxt(chromosome_hash_file)
         data[chr] = chr_data
 

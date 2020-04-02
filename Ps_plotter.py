@@ -31,7 +31,8 @@ def row2color(row):
             "Aedes": "springgreen",
             "Polypedium" : "springgreen",
             "chick":"springgreen",
-            "mammals":"springgreen"
+            "mammals":"springgreen",
+            "chick_Dekker":"springgreen"
     }
 
     special_styles = {
@@ -86,15 +87,16 @@ datasets = pd.read_csv(dataset, sep="\t",
 analysis = {
 #    "Anopheles": datasets.query("(name in ['Acol','Amer','Aste','Aalb','Aatr'])"),
 #    "test": datasets.query("(name in ['Acol','Amer'])")
-    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex' or name=='Aedes')")
+#    "Other_insects": datasets.query("(subtaxon=='Drosophila' or subtaxon=='culex' or name=='Aedes')")
 #    "mammals": datasets.query("(subtaxon=='mammals')"),
 #    "chicken": datasets.query("(subtaxon=='chick')")
 #    "Nipbl": datasets.query("(name in ['LiverWT','LiverTAM','LiverNipbl'])")
 #    "Aedes":  datasets.query("name=='Aedes'")
 #    "mammals_test": datasets.query("(name=='BonevNPC')")
+    "all_maps_from_Gibcus_et_al": datasets.query("subtaxon=='chick_Dekker'")
 }
 
-multuplot = False # draw all graphs on one plot or draw multiple subplots
+multiplot = False # draw all graphs on one plot or draw multiple subplots
 
 #for func in ["Ps_log"]:
 #for func in ["Ps"]:
@@ -137,7 +139,7 @@ for func in ["Slope"]:
             if ind >= report and ind % report == 0:
                 #plt.show()
                 break
-        if multuplot:
+        if multiplot:
             #multiplots(plots, shadow=(func=="Slope"), average=(func=="Slope"))
             #multiplots(plots, shadow=False, average=False)
             if func=="Slope":
@@ -149,5 +151,5 @@ for func in ["Slope"]:
         else:
             multiplot_with_subplots(plots, xlabel="Genomic distance", y_label="Slope")
         plt.tight_layout()
-        plt.savefig("result_"+suffix+"_"+func+"_"+str(multuplot)+".png",dpi=500)
+        plt.savefig("result_" + suffix +"_" + func +"_" + str(multiplot) + ".png", dpi=500)
         plt.clf()
