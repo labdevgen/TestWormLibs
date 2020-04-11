@@ -34,9 +34,13 @@ def get_vaid_chrms_from_straw(strawObj,
     assert len(valid_chrms) > 0
     return valid_chrms
 
-def get_dumpPath(*args, root="."):
+def get_dumpPath(*args, root=".", create_dirs = False):
     description = "".join((map(str,args))).encode("utf-8")
-    return os.path.join(root,md5(description).hexdigest())
+    res = os.path.join(root,md5(description).hexdigest())
+    if create_dirs and not os.path.isdir(os.path.dirname(res)):
+        os.makedirs(os.path.dirname(res))
+    return res
+
 
 # dump data to .expected file or reload from cash
 def dump(file, juicerpath, resolution, minchrsize = 20000000,
@@ -97,6 +101,25 @@ def computeExpected(data, resolution):
                           right_on = "all_dist", how="outer").sort_index()["count"].fillna(0.)
     return result
 
+def get_contacts_using_juicer_dump(juicerpath,file,chr,resolution):
+    # dump contacts from chromosome to temp file, then read if to Dframe
+    command = ["java", "-jar", juicerpath, "dump", "observed",
+               "KR", file, chr, chr, "BP", str(resolution), "temp.contacts"]
+    print(" ".join(command))
+    try:
+        subprocess.run(" ".join(command), shell=True,
+                       stdout=subprocess.PIPE,
+                       stderr=subprocess.PIPE,
+                       check=True)
+    except subprocess.CalledProcessError as e:
+        print(e)
+        exit(1)
+    contacts = pd.read_csv("temp.contacts", sep="\t", header=None, names=["st1", "st2", "count"],
+                           dtype={"st1": np.uint32, "st2": np.uint32, "count": np.float64})
+    contacts["dist"] = contacts["st2"] - contacts["st1"]
+    assert np.all(contacts["dist"].values >= 0)
+    return contacts
+
 def getExpectedByCompartments(file, juicerpath, resolution,
                               minchrsize = 20000000,
                               maxchrsize = 150000000,
@@ -108,13 +131,14 @@ def getExpectedByCompartments(file, juicerpath, resolution,
         compartments_file = None
     dump_path = get_dumpPath([file,resolution,minchrsize,excludechrms,compartments_file,
                                   correlation_standard],
-                             root="data/Expected_by_compartment/")
+                             root="data/Expected_by_compartment/",
+                            create_dirs=True)
     if os.path.isfile(dump_path):
         return pickle.load(open(dump_path,"rb"))
 
     all_expected_hashfile = get_dumpPath(file,resolution,minchrsize,excludechrms,
-                            root="data/all_chr_dumps")
-
+                            root="data/all_chr_dumps",
+                            create_dirs=True)
 
     # it takes a long time to get list of chrms frow hic-files located in cloud
     # let's try to load it from expected dumps
@@ -180,29 +204,14 @@ def getExpectedByCompartments(file, juicerpath, resolution,
         # contacts["st2"] = contacts["st2"]*resolution
         # contacts.dropna(inplace=True)
 
-        command = ["java", "-jar", juicerpath, "dump", "observed",
-                   "KR", file, chr, chr, "BP", str(resolution), "temp.contacts"]
-        print(" ".join(command))
-        try:
-            subprocess.run(" ".join(command), shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           check=True)
-        except CalledProcessError as e:
-            print(e)
-            exit(1)
-        contacts = pd.read_csv("temp.contacts",sep="\t",header=None,names=["st1","st2","count"],
-                               dtype={"st1":np.uint32,"st2":np.uint32,"count":np.float64})
-        print (contacts.dtypes)
+        contacts = get_contacts_using_juicer_dump(juicerpath,
+                            file,chr,resolution)
         contacts = contacts.merge(E1chr,how="inner",left_on="st1",right_on="st").rename(
             columns={"E1":"E1_st1"})
         print (contacts.dtypes)
         contacts = contacts.merge(E1chr,how="inner",left_on="st2",right_on="st").rename(
             columns={"E1":"E1_st2"})
         print (contacts.dtypes)
-        contacts["dist"] = contacts["st2"]-contacts["st1"]
-        print (contacts.dtypes)
-        assert np.all(contacts["dist"].values >= 0)
 
         # ready to compute expected
         A_interactions = contacts.query("E1_st1 > 0 and E1_st2 > 0")
@@ -223,4 +232,50 @@ def getExpectedByCompartments(file, juicerpath, resolution,
                 Exp.to_csv(chr_dump_path,sep="\t",header=False,index=False)
     assert len(results) != 0
     pickle.dump(results, open(dump_path,"wb"))
+    return results
+
+def getExpected(file, juicerpath, resolution,
+                              minchrsize = 20000000,
+                    excludechrms = ("X","chrX","Y","chrY","Z","chrZ","W","chrW"),
+                    save_by_chr_dumps = True):
+
+    # get dump path and create dump dirs
+    dump_path = get_dumpPath([file,resolution,minchrsize,excludechrms],
+                             root="data/Expected/",
+                             create_dirs=True)
+
+    # search for dump and load if found
+    if os.path.isfile(dump_path):
+        return pickle.load(open(dump_path,"rb"))
+
+    all_expected_hashfile = get_dumpPath(file,resolution,minchrsize,excludechrms,
+                            root="data/all_chr_dumps",
+                             create_dirs=True)
+
+    # it takes a long time to get list of chrms frow hic-files located in cloud
+    # let's try to load it from expected dumps
+    if os.path.isfile(all_expected_hashfile):
+        valid_chrms=list(pickle.load(open(all_expected_hashfile,"rb")).keys())
+    else:
+        strawObj = straw.straw(file)
+        valid_chrms = get_vaid_chrms_from_straw(strawObj, minchrsize, excludechrms)
+
+    results = {}
+    label = "all_contacts"  # not to be confused with AA-AB-BA expected generated by other funcs
+    results[label] = {}
+    for chr in valid_chrms:
+        print ("Processing chromosome ",chr)
+        contacts = get_contacts_using_juicer_dump(juicerpath,
+                            file,chr,resolution)
+        # compute expected
+        Exp = computeExpected(contacts, resolution)
+        if save_by_chr_dumps:
+                chr_dump_path = get_dumpPath([file, resolution, minchrsize, excludechrms, chr, label],
+                                             root="data/Expected_by_compartment/",
+                                             create_dirs = True
+                                            ) +"_"+ label+"_"+chr
+                Exp.to_csv(chr_dump_path,sep="\t",header=False,index=False)
+        results["all_contacs"][chr] = Exp.values
+    pickle.dump(results, open(dump_path,"wb"))
+
     return results
