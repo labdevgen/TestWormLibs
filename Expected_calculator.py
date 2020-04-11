@@ -91,10 +91,6 @@ def dump(file, juicerpath, resolution, minchrsize = 20000000,
 def computeExpected(data, resolution):
     result = data.groupby(by="dist").aggregate(np.nanmean)
     # it might be that not all distance values are present. Add NaNs
-    print(result.head())
-    print(result.dtypes)
-
-    print(resolution)
     all_possible_values = pd.DataFrame({"all_dist":range(0,int(max(result.index.values))+1,
                                                       resolution)})
     result = result.merge(all_possible_values,left_index=True,
