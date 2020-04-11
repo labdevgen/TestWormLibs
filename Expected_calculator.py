@@ -275,7 +275,7 @@ def getExpected(file, juicerpath, resolution,
                                              create_dirs = True
                                             ) +"_"+ label+"_"+chr
                 Exp.to_csv(chr_dump_path,sep="\t",header=False,index=False)
-        results["all_contacs"][chr] = Exp.values
+        results[label][chr] = Exp.values
     pickle.dump(results, open(dump_path,"wb"))
 
     return results
